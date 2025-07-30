@@ -9,7 +9,7 @@ st.set_page_config(page_title="Spektrofotometri Sederhana", layout="wide")
 st.title("📊 Analisis Spektrofotometri - Beer's Law")
 
 st.markdown("Masukkan minimal 3 data standar (konsentrasi dan absorbansi):")
-st.markdown("🔔 *Catatan:* Gunakan tanda titik (.) untuk mengganti tanda koma (,) dalam penulisan angka desimal.")
+st.markdown("🔔 **Catatan:** Gunakan tanda titik (.) untuk mengganti tanda koma (,) dalam penulisan angka desimal.")
 
 # Input data standar
 num_std = st.number_input("Jumlah data standar", min_value=3, max_value=20, value=6)
@@ -50,8 +50,8 @@ if abs(a) < 1e-6:
     st.error("Slope terlalu kecil. Data mungkin tidak cukup bervariasi atau tidak linier.")
     st.stop()
 
-# Plot kurva super kecil tapi tetap jelas
-fig, ax = plt.subplots(figsize=(1.3, 1.3))  # ukuran sangat kecil
+# Plot kurva super kecil dengan legend diperkecil
+fig, ax = plt.subplots(figsize=(1.3, 1.3))  # ukuran kecil
 x_fit = np.linspace(0, df["Konsentrasi"].max() * 1.1, 100)
 y_fit = a * x_fit + b
 
@@ -63,14 +63,16 @@ ax.set_ylabel("Absorbansi", fontsize=6)
 ax.set_title("Kurva Kalibrasi", fontsize=7)
 ax.tick_params(axis='both', labelsize=5)
 ax.grid(True, linewidth=0.25, alpha=0.5)
-ax.legend(fontsize=5, markerscale=0.6)
+
+# Legend kecil supaya tidak menutupi kurva
+ax.legend(fontsize=4, markerscale=0.6, loc="best")
 
 st.pyplot(fig)
 
 # Parameter regresi + interpretasi singkat
 st.markdown("### 📌 Parameter Regresi & Interpretasi")
-st.write(f"📖 Interpretasi slope: Setiap kenaikan 1 ppm konsentrasi, absorbansi bertambah sekitar {a:.4f} satuan.")
-st.write(f"📖 Interpretasi intersep: Saat konsentrasi 0 ppm, absorbansi awal diperkirakan {b:.4f} (bisa mencerminkan noise atau error sistematis).")
+st.write(f"📖 Interpretasi slope (a): Setiap kenaikan 1 ppm konsentrasi, absorbansi bertambah sekitar {a:.4f} satuan.")
+st.write(f"📖 Interpretasi intersep (b): Saat konsentrasi 0 ppm, absorbansi awal diperkirakan {b:.4f} (bisa mencerminkan noise atau error sistematis).")
 st.write(f"📖 Interpretasi r: Nilai r {r_value:.4f} menunjukkan {'hubungan yang sangat kuat' if r_value>0.995 else ('hubungan yang kuat' if r_value>0.98 else 'hubungan yang lemah')} antara konsentrasi dan absorbansi.")
 st.write(f"R-squared: {r_squared:.4f} — {'Model menjelaskan variasi data dengan baik.' if r_squared>0.98 else 'Model kurang menjelaskan variasi data.'}")
 
