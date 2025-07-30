@@ -9,7 +9,7 @@ st.set_page_config(page_title="Spektrofotometri Sederhana", layout="wide")
 st.title("📊 Analisis Spektrofotometri - Beer's Law")
 
 st.markdown("Masukkan minimal 3 data standar (konsentrasi dan absorbansi):")
-st.markdown("🔔 **Catatan:** Gunakan tanda titik (.) untuk mengganti tanda koma (,) dalam penulisan angka desimal.")
+st.markdown("🔔 Catatan: Gunakan tanda titik (.) untuk mengganti tanda koma (,) dalam penulisan angka desimal.")
 
 # Input data standar
 num_std = st.number_input("Jumlah data standar", min_value=3, max_value=20, value=6)
@@ -86,7 +86,6 @@ sample_data = pd.DataFrame({"Absorbansi": ["" for _ in range(num_samples)]})
 
 edited_samples = st.data_editor(sample_data, num_rows="dynamic", key="samples_editor", use_container_width=True)
 
-# Hitung otomatis konsentrasi
 df_samples = edited_samples.copy()
 conc_values = []
 abs_values = []
@@ -104,13 +103,33 @@ for i in range(len(df_samples)):
 st.markdown("#### 📋 Tabel Hasil Sampel")
 st.table(df_samples)
 
-# Hitung RSD dan Horwitz jika data valid
+# Hitung RSD, Horwitz, dan RPD jika data valid
 if conc_values:
     avg_conc_values = np.mean(conc_values)
-    selisih_values = [(x - avg_conc_values)**2 for x in conc_values]
+    selisih_values = []
+    sample_results = []
+
+    for i in range(num_samples):
+        try:
+            selisih = math.fabs(conc_values[i] - avg_conc_values)
+            rpd = selisih / avg_conc_values * 100 if avg_conc_values != 0 else 0
+            selisih_values.append(selisih * selisih)
+            sample_results.append({
+                "Sampel": f"S{i+1}",
+                "Absorbansi": f"{abs_values[i]:.4f}",
+                "Konsentrasi (ppm)": f"{conc_values[i]:.3f}",
+                "Selisih dengan Rata2": f"{selisih:.3f}",
+                "RPD": f"{rpd:.3f}%"
+            })
+        except:
+            pass
+
     rsd = math.sqrt(np.mean(selisih_values))
     st.markdown(f"📌 Rata-rata: {avg_conc_values:.2f}")
     st.markdown(f"📌 %RSD = {rsd:.2f}")
+
+    st.markdown("#### 📋 %RPD per Sampel")
+    st.table(pd.DataFrame(sample_results))
 
     st.markdown("#### 📉 Evaluasi Presisi (CV Horwitz)")
     horwitz_results = []
