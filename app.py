@@ -86,6 +86,7 @@ sample_data = pd.DataFrame({"Absorbansi": ["" for _ in range(num_samples)]})
 
 edited_samples = st.data_editor(sample_data, num_rows="dynamic", key="samples_editor", use_container_width=True)
 
+# Hitung otomatis konsentrasi
 df_samples = edited_samples.copy()
 conc_values = []
 abs_values = []
